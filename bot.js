@@ -17,30 +17,42 @@ client.on('message', message => {
 
         var tmp = message.content.split(" ");
 
+    
+
         if(tmp != undefined && tmp != null){
 
+            if(tmp[1] === "update"){
+                database.updateUser(message.member.id,message.member.displayName);
+            }
+
             if(tmp[1] === "ranking"){
-                console.log(database.getAllUsers());
-                // .then(users => {
-                //     var mensagem = "";
-                //     if(users && users.length>0){
-                //         for(let i=0;i<users.length;i++){
-                //             mensagem += i+1 + " - " + users.name + " - " + users.score +"\n";
-                //         }
-                //     }else{
-                //         mensagem = "No users";
-                //     }
-                //     let embedMessage = new discord.RichEmbed();
-                //     embedMessage.setTitle("RANKING");
-                //     embedMessage.setDescription(mensagem);
-                //     embedMessage.setColor(0xFF0000);
+                database.getAllUsers().then(users => {
+                     var mensagem = "";
+                     if(users && users.length>0){
+                         for(let i=0;i<users.length;i++){
+                             if(users[i].id == message.member.id){
+                                 mensagem += i+1 + " - " + message.author.toString() + "  -  " + users[i].score + "\n";
+                             }else{
+                             mensagem += i+1 + " - " + users[i].name + "  -  " + users[i].score +"\n";
+                             }
+                         }
+                     }else{
+                         mensagem = "No users";
+                     }
 
-                //     message.channel.send(embedMessage);
-                // })
-                // .catch(error => {
-                //     console.log(error);
-                // })
-
+                     console.log(mensagem);
+                     let embedMessage = new discord.RichEmbed();
+                     embedMessage.setAuthor("Guess Bot","");
+                     embedMessage.setTitle("----------RANKING----------");   
+                     
+                     embedMessage.setDescription(mensagem);
+                     embedMessage.setColor(0x00DDDD);
+                     message.channel.send(embedMessage);
+                 })
+                 .catch(error => {
+                     console.log(error);
+                 })
+                
             }
 
             if(tmp[1] === "time"){
