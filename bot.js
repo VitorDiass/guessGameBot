@@ -104,27 +104,31 @@ client.on('message', message => {
                                     utils.songLengthAsync("song.mp3").then(length => {
                                         length = parseInt(length.toString().replace(".",""));
                                         utils.randomSongTime(length).then(random => {
-                                            let timeInMS = utils.millisToMinutesAndSeconds(random);
-                                            console.log(timeInMS);
-                                            
-                                            let youtubeSong = youtube("https://www.youtube.com/watch?v=gAwDw5zXtLI",[{"quality" : "lowest","filter" : "audioonly","range" : {"start" : timeInMS, "end" : timeInMS + 5000},"begin" :timeInMS}])
-                                                                .pipe(fs.createWriteStream('video.mp3'));
+                                          utils.millisToMinutesAndSeconds(random).then(timeInMS => {
+
+                                            let youtubeSong = youtube("https://www.youtube.com/watch?v=gAwDw5zXtLI", {begin});
+                                            //let youtubeSong = youtube("https://www.youtube.com/watch?v=gAwDw5zXtLI",[{"quality" : "lowest"},{"filter" : "audioonly"},{"range" : {"start" : timeInMS, "end" : timeInMS + 5000}},{"begin" :timeInMS}])
+                                                                //.pipe(fs.createWriteStream('video.mp3'));
+                                                    
                                             const streamPlay = connection.playStream(youtubeSong);
+                                            
                                             // const stream = fs.createReadStream(config.songsPath + "song.mp3");
                                             // const streamOptions = { seek: timeInMS, passes: 2, bitrate: "auto" };
                                             // const streamPlay = connection.playStream(stream, streamOptions); 
 
-                                            setTimeout(() => {
-                                                streamPlay.end();
-                                                stream.destroy();
-                                                const embedMessage = new discord.RichEmbed();
-                                                embedMessage.setColor(0xFF0000);
-                                                embedMessage.setTitle("Time to guess");
-                                                embedMessage.setDescription("!guess b to guess the band - 1 point \n \
-                                                                        !guess s to guess the song - 2 points\n \
-                                                                        !guess sb to guess the song and the band - 3 points");
-                                                                        message.channel.send(embedMessage)},5000)
-                                            
+                                            // setTimeout(() => {
+                                            //     streamPlay.end();
+                                            //     youtubeSong.destroy();
+                                                
+                                            //     //stream.destroy();
+                                            //     const embedMessage = new discord.RichEmbed();
+                                            //     embedMessage.setColor(0xFF0000);
+                                            //     embedMessage.setTitle("Time to guess");
+                                            //     embedMessage.setDescription("!guess b to guess the band - 1 point \n \
+                                            //                             !guess s to guess the song - 2 points\n \
+                                            //                             !guess sb to guess the song and the band - 3 points");
+                                            //                             message.channel.send(embedMessage)},5000)
+                                          }).catch(error => {consol.log(error)})
                                             }).catch( error => {console.log(error)} )        
                                         })
 
