@@ -14,7 +14,7 @@ exports.songLengthAsync = async function (songName){
 exports.randomSongTime = async function(songLength) {
     var startTime = 1000;
     var songLengthFloor = Math.floor(songLength);
-    let randomTime = await Math.floor(Math.random() * (Number(songLengthFloor) - Number(startTime +1 ) ) + Number(startTime)); 
+    let randomTime = await Math.floor(Math.random() * (Number(songLengthFloor) - Number(startTime +1 ) ) + Number(startTime)) - 5000; 
     return randomTime;
 }
 

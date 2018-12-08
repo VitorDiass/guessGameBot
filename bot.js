@@ -3,6 +3,7 @@ var config = require('./config.json');
 const fs = require('fs');
 const utils = require('./utils');
 const database = require("./database");
+const youtube = require("ytdl-core");
 
 const client = new discord.Client();
 
@@ -39,6 +40,19 @@ client.on('message', message => {
                      }else{
                          mensagem = "No users";
                      }
+                     let embed = {
+                        "title": "-----------RANKING----------",
+                        "color": 7505801,
+                        // "thumbnail": {
+                        //   "url": "https://cdn.discordapp.com/embed/avatars/0.png"
+                        // },
+                        "author": {
+                          "name": "Guess Bot",
+                          "icon_url": "https://www.iconsdb.com/icons/preview/orange/trophy-2-xxl.png"
+                        },
+                        "description" : mensagem
+                      };
+
 
                      console.log(mensagem);
                      let embedMessage = new discord.RichEmbed();
@@ -47,7 +61,7 @@ client.on('message', message => {
                      
                      embedMessage.setDescription(mensagem);
                      embedMessage.setColor(0x00DDDD);
-                     message.channel.send(embedMessage);
+                     message.channel.send({embed});
                  })
                  .catch(error => {
                      console.log(error);
@@ -92,9 +106,14 @@ client.on('message', message => {
                                         utils.randomSongTime(length).then(random => {
                                             let timeInMS = utils.millisToMinutesAndSeconds(random);
                                             console.log(timeInMS);
-                                            const stream = fs.createReadStream(config.songsPath + "song.mp3");
-                                            const streamOptions = { seek: timeInMS, passes: 2, bitrate: "auto" };
-                                            const streamPlay = connection.playStream(stream, streamOptions); 
+                                            
+                                            let youtubeSong = youtube("https://www.youtube.com/watch?v=gAwDw5zXtLI",[{"quality" : "lowest","filter" : "audioonly","range" : {"start" : timeInMS, "end" : timeInMS + 5000},"begin" :timeInMS}])
+                                                                .pipe(fs.createWriteStream('video.mp3'));
+                                            const streamPlay = connection.playStream(youtubeSong);
+                                            // const stream = fs.createReadStream(config.songsPath + "song.mp3");
+                                            // const streamOptions = { seek: timeInMS, passes: 2, bitrate: "auto" };
+                                            // const streamPlay = connection.playStream(stream, streamOptions); 
+
                                             setTimeout(() => {
                                                 streamPlay.end();
                                                 stream.destroy();
