@@ -74,7 +74,24 @@ exports.getAllUsers = async function () {
         }));
         return res;
     }
-}    
+}
+
+exports.getSongs = async function() {
+    if(db){
+        var sql = "select t.id, t.nome as songName, t.mp3 as fileName, ta.nome as albumName, ta.abbreviation as albumAbb, tb.nome as bandName, tb.abbreviation as bandAbb from song t \
+        inner join album ta on ta.id = t.album_Id \
+        inner join band tb on tb.id = ta.band_Id";
+
+        let res = await new Promise((resolve,reject) => db.query(sql, function(err,result,fields){
+            if(err) reject(err);
+            else{
+                db.end();
+                resolve(result);
+            }
+        }));
+        return res;
+    }
+}
 
 
 

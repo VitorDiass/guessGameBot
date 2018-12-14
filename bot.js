@@ -18,13 +18,14 @@ client.on('message', message => {
 
         var tmp = message.content.split(" ");
 
-    
-
         if(tmp != undefined && tmp != null){
 
-            if(tmp[1] === "update"){
-                database.updateUser(message.member.id,message.member.displayName);
-            }
+             if(tmp[1] === "update"){
+                 //database.updateUser(message.member.id,message.member.displayName);
+                 database.getSongs().then(result => {
+                     console.log(result);
+                 })
+             }
 
             if(tmp[1] === "ranking"){
                 database.getAllUsers().then(users => {
@@ -73,16 +74,19 @@ client.on('message', message => {
                 utils.songLengthAsync("song.mp3").then(length => {
                     length = parseInt(length.toString().replace(".",""));
                     utils.randomSongTime(length).then(random => {
-                        console.log(random);
+                        
                         let timeInMS = utils.millisToMinutesAndSeconds(random);
-                        console.log(timeInMS);
+                        timeInMS.then(x => {
+                            console.log(x);
+                        })
                         // const stream = fs.createReadStream(config.songsPath + "song.mp3");
                         // console.log(stream.path);
                         // const streamOptions = { seek: timeInMS, passes: 2, bitrate: "auto" };
                         // const tmp = connection.playStream(stream, streamOptions);
                         console.log("aqui2");      
-                        database.insertUser(message.member.user.id,message.member.displayName,0);
+                        //database.insertUser(message.member.user.id,message.member.displayName,0);
                         //database.updateUser(message.member.user.id,message.member.displayName,5);
+                        
                     })
 
                     }
@@ -106,11 +110,6 @@ client.on('message', message => {
                                         utils.randomSongTime(length).then(random => {
                                           utils.millisToMinutesAndSeconds(random).then(timeInMS => {
 
-                                            let youtubeSong = youtube("https://www.youtube.com/watch?v=gAwDw5zXtLI", {begin});
-                                            //let youtubeSong = youtube("https://www.youtube.com/watch?v=gAwDw5zXtLI",[{"quality" : "lowest"},{"filter" : "audioonly"},{"range" : {"start" : timeInMS, "end" : timeInMS + 5000}},{"begin" :timeInMS}])
-                                                                //.pipe(fs.createWriteStream('video.mp3'));
-                                                    
-                                            const streamPlay = connection.playStream(youtubeSong);
                                             
                                             // const stream = fs.createReadStream(config.songsPath + "song.mp3");
                                             // const streamOptions = { seek: timeInMS, passes: 2, bitrate: "auto" };

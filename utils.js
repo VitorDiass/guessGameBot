@@ -25,3 +25,15 @@ exports.millisToMinutesAndSeconds = async function (millis) {
     return res;
   }
  
+exports.getRandomSong = async function(songObj){
+    if(songObj != null && songObj != undefined){
+       let songsId = [];
+
+      songObj.forEach(res => songsId.push(res.id));
+
+      let res  = await songsId[Math.floor(Math.random() * songsId.length)];
+
+      return res;
+
+    }
+}
