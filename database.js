@@ -93,16 +93,16 @@ exports.getUserById = async function (id) {
     }
 }
 
-exports.getSongs = async function() {
-    
-    if(db){
+exports.getSongs = async function (condition) {
+    if (db) {
+        let cond = condition !== null && condition !== undefined ? condition : "";
         var sql = "select t.id, t.nome as songName, t.mp3 as fileName, ta.nome as albumName, ta.abbreviation as albumAbb, tb.nome as bandName, tb.abbreviation as bandAbb from song t \
         inner join album ta on ta.id = t.album_Id \
-        inner join band tb on tb.id = ta.band_Id";
+        inner join band tb on tb.id = ta.band_Id " + cond;
 
-        let res = await new Promise((resolve,reject) => db.query(sql, function(err,result,fields){
-            if(err) reject(err);
-            else{   
+        let res = await new Promise((resolve, reject) => db.query(sql, function (err, result, fields) {
+            if (err) reject(err);
+            else {
                 resolve(result);
             }
         }));

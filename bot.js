@@ -105,6 +105,13 @@ client.on('message', message => {
                 if(message.member.voiceChannel){
                     message.member.voiceChannel.join().then(
                                 connection => {
+                                    let cond = "where coalesce(t.ativo,0)=1";
+                                    database.getSongs(cond).then(song => {
+                                        if(song && song.length == 1){
+                                            console.log(song);
+                                        }else{
+                                            //pick a random song
+
                                     database.getSongs().then(result => {
                                         let song = utils.getRandomSong(result);
                                         utils.songLengthAsync(song.fileName).then(length => {
@@ -125,9 +132,10 @@ client.on('message', message => {
                                                  const embedMessage = new discord.RichEmbed();
                                                  embedMessage.setColor(0xFF0000);
                                                  embedMessage.setTitle("Time to guess");
-                                                 embedMessage.setDescription("!guess b to guess the band - 1 point \n \
-                                                                         !guess s to guess the song - 2 points\n \
-                                                                         !guess sb to guess the song and the band - 3 points");
+                                                 embedMessage.setDescription("command < !guess band to guess > the band -> 1 point \n \
+                                                                         command < !guess album > to guess the album -> 2 points \n \
+                                                                         command < !guess song > to guess the song -> 3 points \n \
+                                                                         command < !guess all > to guess the song the album and the band -> 5 points");
 
                                                 message.channel.send(embedMessage);
                                                 songGlobal = song;},5000)
@@ -140,6 +148,9 @@ client.on('message', message => {
                                     .catch(error => {
                                         console.log(error);
                                     })
+                                        }
+                                    })
+
                                 }
                     )
                 }else{
@@ -161,22 +172,104 @@ client.on('message', message => {
                             })
                             let embed = utils.embedMessageImage("Band - Correct", "You are a genius, you got 1 point","3659367","https://cdn1.iconfinder.com/data/icons/warnings-and-dangers/400/Warning-02-512.png");
                             message.channel.send({embed});
+                            songGlobal = null;
 
                         }else{
                             let embed = utils.embedMessageImage("Band - Wrong", "Nice try but... you got 0 points","14039350","https://cdn3.iconfinder.com/data/icons/simple-web-navigation/165/cross-512.png");
                             message.channel.send({embed});
                         }
                     }else{
-                        message.channel.send(message.author.toString() + ", you have to play a song first before you can guess the band");
+                        message.channel.send(message.author.toString() + ", you have to play a song first before you can guess");
                     }
                 }else{
                     message.channel.send(message.author.toString() + ", please specify a band name (without spaces)");
                 }
             }
+
+            if(tmp[1] === "album"){
+                if(songGlobal !== undefined && songGlobal != null){
+                if(tmp.length === 3){
+                    let albumRes = tmp[2].trim().toLowerCase();
+                    
+                        if(albumRes == songGlobal.albumName || albumRes == songGlobal.albumAbb){
+                            database.getUserById(message.member.id).then(user => {
+                                if(user){
+                                    let newScore = user[0].score + 2;
+                                    database.updateUserScore(message.member.id,message.member.displayName,newScore);
+                                }
+                            })
+                            let embed = utils.embedMessageImage("Album - Correct", "You are a genius, you got 2 points","3659367","https://cdn1.iconfinder.com/data/icons/warnings-and-dangers/400/Warning-02-512.png");
+                            message.channel.send({embed});
+                            songGlobal = null;
+                        }else{
+                            let embed = utils.embedMessageImage("Album - Wrong", "Nice try but... you got 0 points","14039350","https://cdn3.iconfinder.com/data/icons/simple-web-navigation/165/cross-512.png");
+                            message.channel.send({embed});
+                        }
+                    }else{
+                        message.channel.send(message.author.toString() + ", please specify a album name (without spaces)");
+                    }
+                }else{
+                    message.channel.send(message.author.toString() + ", you have to play a song first before you can guess");
+                   
+                }
+            }
+
+            if(tmp[1] === "song"){
+                if(songGlobal !== undefined || songGlobal !== null){
+                    if(tmp.length === 3){
+                    let songRes = tmp[2].trim().toLowerCase();
+                    if(songRes == songGlobal.songName){
+                        database.getUserById(message.member.id).then(user => {
+                            if(user){
+                                let newScore = user[0].score + 3;
+                                database.updateUserScore(message.member.id,message.member.displayName,newScore);
+                            }
+                        })
+                        let embed = utils.embedMessageImage("Song - Correct", "You are a genius, you got 3 points","3659367","https://cdn1.iconfinder.com/data/icons/warnings-and-dangers/400/Warning-02-512.png");
+                            message.channel.send({embed});
+                            songGlobal = null;
+                    }else{
+                        let embed = utils.embedMessageImage("Song - Wrong", "Nice try but... you got 0 points","14039350","https://cdn3.iconfinder.com/data/icons/simple-web-navigation/165/cross-512.png");
+                        message.channel.send({embed});
+                    }
+                }else{
+                    message.channel.send(message.author.toString() + ", please specify a song name (without spaces)");
+                }
+            }else{
+                message.channel.send(message.author.toString() + ", you have to play a song first before you can guess");
+            }
         }
 
+        if(tmp[1] === "all"){
+            if(songGlobal !== undefined && songGlobal !== null){
+                if(tmp.length === 5){
+                    let songRes = tmp[2].trim().toLowerCase();
+                    let albumRes = tmp[3].trim().toLowerCase();
+                    let bandRes = tmp[4].trim().toLowerCase();
+                    if(songGlobal.songName == songRes && (songGlobal.albumName == albumRes || songGlobal.albumAbb == albumRes) && (songGlobal.bandName == bandRes || songGlobal.bandAbb == bandRes)){
+                        database.getUserById(message.member.id).then(user => {
+                            if(user){
+                                let newScore = user[0].score + 5;
+                                database.updateUserScore(message.member.id,message.member.displayName,newScore);
+                            }
+                        })
+                        let embed = utils.embedMessageImage("All - Correct", "You are a GOD, you got 5 points","3659367","https://cdn1.iconfinder.com/data/icons/warnings-and-dangers/400/Warning-02-512.png");
+                        message.channel.send({embed});
+                        songGlobal = null;
 
+                    }else{
+                        let embed = utils.embedMessageImage("All - Wrong", "Nice try but... you got 0 points","14039350","https://cdn3.iconfinder.com/data/icons/simple-web-navigation/165/cross-512.png");
+                        message.channel.send({embed});
+                    }
+                }else{
+                    message.channel.send(message.author.toString() + ", please specify the information in the order of songName albumName bandName");
+                }
+            }else{
+                message.channel.send(message.author.toString() + ", you have to play a song first before you can guess");
+            }
+        }
     }
+}
 
     // If the message is "how to embed"
     if (message.content === 'how to embed') {
