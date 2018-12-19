@@ -25,7 +25,7 @@ exports.insertUser = function (id,name,score){
         db.query(sql, function (err, result) {
             if (err) throw err;
             console.log("user inserted - " + result.affectedRows);
-            db.end();
+        
         })
     } else {
         console.log("Error obtaining DB connection");
@@ -39,7 +39,7 @@ exports.updateUser = function(id,name){
         db.query(sql,values,function(err,result){
             if(err)throw err;
             console.log("user updated - " + result.affectedRows);
-            db.end();
+          
         })
     }else{
         console.log("Error obtaining DB Connection");
@@ -54,7 +54,7 @@ exports.updateUserScore = function (id,name,score){
         db.query(sql,values, function(err, result) {
             if(err) throw err;
             console.log("user updated - " + result.affectedRows);
-            db.end();
+           
         })
     }else{
         console.log("Error obtaining DB connection");
@@ -62,13 +62,30 @@ exports.updateUserScore = function (id,name,score){
 
 }
 
+
+
 exports.getAllUsers = async function () {
     if (db) {
         var sql = "SELECT code,id,name,score FROM user ORDER BY score DESC";
-        let res = await new Promise((resolve,reject) => db.query(sql, async function (err, result, fields) {
+        let res = await new Promise((resolve,reject) => db.query(sql, function (err, result, fields) {
             if (err) reject(err);
             else {
-                db.end();
+              
+                resolve(result);
+            }
+        }));
+        return res;
+    }
+}
+
+exports.getUserById = async function (id) {
+    if (db) {
+        let values = [id];
+        var sql = "SELECT code,id,name,score FROM user where id=?";
+        let res = await new Promise((resolve,reject) => db.query(sql,values, function (err, result, fields) {
+            if (err) reject(err);
+            else {
+               
                 resolve(result);
             }
         }));
@@ -77,6 +94,7 @@ exports.getAllUsers = async function () {
 }
 
 exports.getSongs = async function() {
+    
     if(db){
         var sql = "select t.id, t.nome as songName, t.mp3 as fileName, ta.nome as albumName, ta.abbreviation as albumAbb, tb.nome as bandName, tb.abbreviation as bandAbb from song t \
         inner join album ta on ta.id = t.album_Id \
@@ -84,14 +102,14 @@ exports.getSongs = async function() {
 
         let res = await new Promise((resolve,reject) => db.query(sql, function(err,result,fields){
             if(err) reject(err);
-            else{
-                db.end();
+            else{   
                 resolve(result);
             }
         }));
         return res;
     }
 }
+
 
 
 
