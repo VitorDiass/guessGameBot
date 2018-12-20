@@ -96,7 +96,7 @@ exports.getUserById = async function (id) {
 exports.getSongs = async function (condition) {
     if (db) {
         let cond = condition !== null && condition !== undefined ? condition : "";
-        var sql = "select t.id, t.nome as songName, t.mp3 as fileName, ta.nome as albumName, ta.abbreviation as albumAbb, tb.nome as bandName, tb.abbreviation as bandAbb from song t \
+        var sql = "select t.id, t.nome as songName,t.ativo as ativo, t.mp3 as fileName, ta.nome as albumName, ta.abbreviation as albumAbb, tb.nome as bandName, tb.abbreviation as bandAbb from song t \
         inner join album ta on ta.id = t.album_Id \
         inner join band tb on tb.id = ta.band_Id " + cond;
 
@@ -107,6 +107,22 @@ exports.getSongs = async function (condition) {
             }
         }));
         return res;
+    }
+}
+
+exports.makeSongActiveOrInactive = function (flag,songId){
+    let active = flag == 1 ? 1 : 0;
+
+    if(db){
+        let values = [active,songId];
+        var sql = "UPDATE song SET ativo=? where id=?";
+
+        db.query(sql,values,function(err,result){
+            if(err)throw err;
+            console.log("song ${songId} updated");
+        })
+    }else{
+        console.log("Error obtaining DB connection");
     }
 }
 
