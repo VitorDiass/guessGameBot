@@ -3,21 +3,57 @@ var config = require('./config.json');
 const fs = require('fs');
 const utils = require('./utils');
 const database = require("./database");
+const youtube = require("youtube-player");
 
 const client = new discord.Client();
+
+let player = youtube('video-player');
+let youtubeLink = null;
 
 var songGlobal = null;
 var guessAttempts = 0;
 
 client.on('ready', () => {
+
     console.log("logged in as " + client.user.tag);
 })
 
 client.on('message', message => {
 
+    if(message.content.contains("piças").toLowerCase()){
+        message.channel.send("O LUÍS É UM PIÇAS");
+    }
+
     if (message.content.startsWith(config.prefix)) {
 
-        var tmp = message.content.split(" ");
+        const messageContent = message.content;
+
+        if(messageContent === "!pcaralho"){
+            youtubeLink = "5h548tOh0_Q";
+        }
+
+        if(youtubeLink){
+
+            if(message.member.voiceChannel){
+
+            
+            message.member.voiceChannel.join().then(
+                connection => {
+                    player.loadVideoById(youtubeLink);
+                    const stream = fs.createReadStream(player.playVideo());
+           /*          const streamOptions = { seek: timeInMS, passes: 2, bitrate: "auto" }; */
+                    const streamPlay = connection.playStream(stream);
+                    player.stopVideo.then(()=> {
+                        streamPlay.end();
+                        streamPlay.destroy();
+                    })
+                }
+            )
+            }else{
+                message.channel.send("o TIO MIGOS diz : 'entraide num canal de voz sobrinhos' ");
+            }
+        }
+        /* var tmp = message.content.split(" ");
 
         if (tmp != undefined && tmp != null) {
 
@@ -338,6 +374,7 @@ client.on('message', message => {
     if (message.content === 'ping') {
         message.channel.send("Pong");
 
+    } */
     }
 });
 

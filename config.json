@@ -1,6 +1,6 @@
 {
     "token" : "",
-    "prefix" : "!guess",
+    "prefix" : "!",
     "songsPath" : "./songs/",
     "maxAttemps" : 10
 }
