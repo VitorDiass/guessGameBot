@@ -378,7 +378,7 @@ client.on('message', message => {
     }
 });
 
-client.login(config.token);
+client.login('NTE5NjI5NDQyMzA2NDA4NDY0.Xps5NA.dv97nbOCoukbKaxOGW6uwvXcQCE');
 
 
 
